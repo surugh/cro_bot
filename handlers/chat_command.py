@@ -17,3 +17,6 @@ async def command_chat_handler(message: Message, bot: Bot) -> None:
                 await message.answer(f"{data.title}\n@{data.username}")
         except exceptions.TelegramBadRequest:
             pass
+        except exceptions.TelegramForbiddenError:
+            pass
+
