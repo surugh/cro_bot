@@ -1,11 +1,7 @@
-from databases.cro_db import Database
-
 from aiogram import Router
 from aiogram.filters import Command
 
 router = Router()
-
-db = Database("databases/cro_data.db")
 
 
 @router.message(Command(commands=['help']))
@@ -33,17 +29,3 @@ async def command_help_handler(message):
         f'для поиска групп с играми\n\n'
         f' ! Ваш общий прогресс будет учитываться при игре в любой из групп '
     )
-    # if db.user_exists(message.from_user.id):
-    #     address = db.address_exists(message.from_user.id)
-    #     if address:
-    #         score = db.get_score(message.from_user.id)*0.001
-    #         await message.answer(
-    #             f"{address}\n{score} VQR"
-    #         )
-    #         await message.answer(
-    #             "тут нужно выплату прикрутить еще!"
-    #         )
-    #     else:
-    #         await message.answer(
-    #             "Ваш адрес VQR не найден"
-    #         )

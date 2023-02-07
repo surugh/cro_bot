@@ -1,5 +1,7 @@
+import os
 import logging
 
+from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher
 
 from handlers import start_command, restart_command, word_handler, \
@@ -7,16 +9,11 @@ from handlers import start_command, restart_command, word_handler, \
 from callbacks import start_callback, restart_callback, word_callback, \
     help_callback
 
-# CroBot
-TOKEN = ""
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path)
+    TOKEN = os.getenv('TOKEN')
 
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.INFO)
-# handler = logging.FileHandler(f"{__name__}.log", mode='w')
-# formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
-# handler.setFormatter(formatter)
-# logger.addHandler(handler)
-# logger.info(f"Testing the custom logger for module {__name__}...")
 logging.basicConfig(
     level=logging.WARNING, filename="cro_log.log",
     format="[%(asctime)s] %(levelname)s %(message)s"
