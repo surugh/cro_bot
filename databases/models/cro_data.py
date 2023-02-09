@@ -7,6 +7,14 @@ class Base(DeclarativeBase):
     pass
 
 
+class Player(Base):
+    __tablename__ = "players"
+
+    user_id: Mapped[int] = mapped_column(primary_key=True)
+    score: Mapped[int]
+    address: Mapped[str]
+
+
 class Chat(Base):
     __tablename__ = "chats"
 

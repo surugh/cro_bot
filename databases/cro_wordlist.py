@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from databases.models.russian_nouns import Word
 
-engine = create_engine("sqlite:///databases/russian_nouns.db")
+engine = create_engine("sqlite:///databases/data/russian_nouns.db")
 
 
 def word_choice() -> str:

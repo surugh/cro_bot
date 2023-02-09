@@ -9,15 +9,15 @@ from handlers import start_command, restart_command, word_handler, \
 from callbacks import start_callback, restart_callback, word_callback, \
     help_callback
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-if os.path.exists(dotenv_path):
-    load_dotenv(dotenv_path)
-    TOKEN = os.getenv('TOKEN')
-
 logging.basicConfig(
     level=logging.WARNING, filename="cro_log.log",
     format="[%(asctime)s] %(levelname)s %(message)s"
 )
+
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path)
+    TOKEN = os.getenv('TOKEN')
 
 
 def main() -> None:

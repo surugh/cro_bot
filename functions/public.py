@@ -1,18 +1,18 @@
 from aiogram import exceptions
 import pydantic.error_wrappers
 
-from databases.cro_db import Database
-from databases.cro_wordlist import word_choice
-from databases.cro_wordlist import word_definition
+from databases import crud
+# from databases.cro_db import Database
+from databases.cro_wordlist import word_choice, word_definition
 from keyboards.start_keyboard import command_start_keyboard, \
     callback_start_keyboard
 
-db = Database("databases/cro_data.db")
+# db = Database("databases/data/cro_data.db")
 
 
 async def remind_hidden(callback):
-    remind = db.get_word(callback.message.chat.id)
-    if db.get_leader(callback.message.chat.id) == callback.from_user.id:
+    remind = crud.get_hidden_word(callback.message.chat.id)
+    if crud.get_leader(callback.message.chat.id) == callback.from_user.id:
         if remind:
             await callback.answer(f"{remind.capitalize()}", show_alert=True)
         else:
@@ -22,24 +22,25 @@ async def remind_hidden(callback):
 
 
 async def get_new_word(callback):
-    if db.get_leader(callback.message.chat.id) == callback.from_user.id:
+    if crud.get_leader(callback.message.chat.id) == callback.from_user.id:
         hidden_word = word_choice()
-        db.add_word(hidden_word.capitalize(), callback.message.chat.id)
+        crud.add_word(hidden_word.capitalize(), callback.message.chat.id)
         await callback.answer(f"{hidden_word.capitalize()}", show_alert=True)
     else:
         await callback.answer("Вы не ведущий", show_alert=True)
 
 
 async def top_players(message, bot):
-    all_players = db.get_players_data()
+    all_players = crud.get_players_data()
     chat_players = []
     for player in all_players:
+        print(player.user_id)
         try:
             chat_player = await bot.get_chat_member(
-                message.chat.id, player[0]
+                message.chat.id, player.user_id
             )
             if chat_player.status != 'left':
-                chat_players.append((chat_player.user.id, int(player[1])))
+                chat_players.append((chat_player.user.id, int(player.score)))
         except exceptions.TelegramBadRequest:
             pass
     sort_players = sorted(
@@ -56,9 +57,9 @@ async def top_players(message, bot):
 
 
 async def start_game(message):
-    if not db.chat_exists(message.chat.id):
-        db.add_chat(message.chat.id)
-    if not db.get_leader(message.chat.id):
+    if not crud.chat_exists(message.chat.id):
+        crud.add_chat(message.chat.id)
+    if not crud.get_leader(message.chat.id):
         await message.answer(
             "<b>Хочешь быть ведущим?</b>",
             reply_markup=command_start_keyboard()
@@ -68,7 +69,7 @@ async def start_game(message):
 
 
 async def new_round(callback):
-    db.add_leader(callback.from_user.id, callback.message.chat.id)
+    crud.add_leader(callback.from_user.id, callback.message.chat.id)
     await callback.message.answer(
         f"Ведущий <b>{callback.from_user.full_name}</b> | "
         f"@{callback.from_user.username}",
@@ -82,9 +83,9 @@ async def new_round(callback):
 
 
 async def refused_game(callback):
-    if callback.from_user.id == db.get_leader(callback.message.chat.id):
-        db.del_leader(callback.message.chat.id)
-        db.del_word(callback.message.chat.id)
+    if callback.from_user.id == crud.get_leader(callback.message.chat.id):
+        crud.del_leader(callback.message.chat.id)
+        crud.del_word(callback.message.chat.id)
         await callback.message.answer(
             f"{callback.from_user.full_name} отказался быть ведущим"
         )
@@ -101,8 +102,8 @@ async def restart_game(message, bot):
         if not admin.user.is_bot:
             admins_id_list.append(admin.user.id)
     if message.from_user.id in admins_id_list:
-        db.del_leader(message.chat.id)
-        db.del_word(message.chat.id)
+        crud.del_leader(message.chat.id)
+        crud.del_word(message.chat.id)
         await message.answer(
             f"{message.from_user.full_name} перезапустил игру"
         )
@@ -114,7 +115,8 @@ async def restart_game(message, bot):
 
 
 async def word_catcher(message):
-    hidden_word = db.get_word(message.chat.id)
+    # hidden_word = db.get_word(message.chat.id)
+    hidden_word = crud.get_hidden_word(message.chat.id)
     if hidden_word:
         word_lower = hidden_word.lower()
         word_replace = word_lower.replace('ё', 'е')
@@ -122,23 +124,23 @@ async def word_catcher(message):
         message_replace = message_lower.replace('ё', 'е')
         if word_replace in message_replace:
             player_id = message.from_user.id
-            if not db.user_exists(player_id):
-                db.add_user(player_id)
-            if db.get_leader(message.chat.id) != player_id:
-                db.add_score(player_id)
+            if not crud.user_exists(player_id):
+                crud.add_user(player_id)
+            if crud.get_leader(message.chat.id) != player_id:
+                crud.add_score(player_id)
                 await message.answer(
                     f"<b>{message.from_user.full_name}</b> | "
-                    f"<b>{db.get_score(message.from_user.id)}</b> очков\n"
-                    f"Угадал слово: <b>{db.get_word(message.chat.id)}</b>"
+                    f"<b>{crud.get_score(message.from_user.id)}</b> очков\n"
+                    f"Угадал слово: <b>{hidden_word}</b>"
                 )
             else:
                 await message.answer(
                     f"<b>{message.from_user.full_name}</b> | "
                     f"<b>Больше не ведущий!</b>\n"
-                    f"Раскрыл слово: <b>{db.get_word(message.chat.id)}</b>"
+                    f"Раскрыл слово: <b>{hidden_word}</b>"
                 )
-            db.del_leader(message.chat.id)
-            db.del_word(message.chat.id)
+            crud.del_leader(message.chat.id)
+            crud.del_word(message.chat.id)
             await start_game(message)
 
 

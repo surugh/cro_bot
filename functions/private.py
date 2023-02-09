@@ -1,11 +1,12 @@
 import os
 import time
 
-from databases.cro_db import Database
+from databases import crud
+# from databases.cro_db import Database
 from keyboards.start_keyboard import command_pay_keyboard, \
     command_address_keyboard
 
-db = Database("databases/cro_data.db")
+# db = Database("databases/data/cro_data.db")
 
 
 def send_funds(address, quantity):
@@ -25,20 +26,20 @@ def validate_address(address):
 
 
 async def pay(callback):
-    address = db.get_address(callback.from_user.id)
-    score = round(db.get_score(callback.from_user.id) * 0.01, 4)
+    address = crud.get_address(callback.from_user.id)
+    score = round(crud.get_score(callback.from_user.id) * 0.01, 4)
     if score >= 0.01:
         pay_hash = send_funds(address, score)
         await callback.message.answer(f"Выплата:\n{address}\n{score}\nHASH:")
         await callback.message.answer(f"{pay_hash}")
-        db.del_score(callback.from_user.id)
+        crud.del_score(callback.from_user.id)
     else:
         await callback.message.answer("Выплаты доступны от 0,01 VQR")
 
 
 async def propose_pay(message):
-    address = db.get_address(message.from_user.id)
-    score = round(db.get_score(message.from_user.id) * 0.01, 4)
+    address = crud.get_address(message.from_user.id)
+    score = round(crud.get_score(message.from_user.id) * 0.01, 4)
     await message.answer(
         f"Вы можете запросить {score} VQR\n"
         f"на ваш текущий адрес для выплат\n\n{address}\n\n"
@@ -48,7 +49,7 @@ async def propose_pay(message):
 
 
 async def check_address(message):
-    address = db.address_exists(message.from_user.id)
+    address = crud.address_exists(message.from_user.id)
     if not address:
         await message.answer(
             "<b>Добавить адрес VQR?</b>",
@@ -74,7 +75,7 @@ async def add_user_address(message):
                     "Проверьте правильность введенных данных"
                 )
             else:
-                db.add_address(message.text, message.from_user.id)
+                crud.add_address(message.text, message.from_user.id)
                 await message.answer(
                     f"Ваш новый адрес\n\n{message.text}\n\nуспешно добавлен"
                 )
