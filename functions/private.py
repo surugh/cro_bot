@@ -2,11 +2,8 @@ import os
 import time
 
 from databases import crud
-# from databases.cro_db import Database
 from keyboards.start_keyboard import command_pay_keyboard, \
     command_address_keyboard
-
-# db = Database("databases/data/cro_data.db")
 
 
 def send_funds(address, quantity):

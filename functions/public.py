@@ -2,12 +2,9 @@ from aiogram import exceptions
 import pydantic.error_wrappers
 
 from databases import crud
-# from databases.cro_db import Database
 from databases.cro_wordlist import word_choice, word_definition
 from keyboards.start_keyboard import command_start_keyboard, \
     callback_start_keyboard
-
-# db = Database("databases/data/cro_data.db")
 
 
 async def remind_hidden(callback):
