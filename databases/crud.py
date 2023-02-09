@@ -110,7 +110,7 @@ def del_word(chat_id: int):
             update(Chat).where(
                 Chat.chat_id == chat_id
             ).values(
-                hidden_vord=None,
+                hidden_word=None,
             )
         )
         session.commit()
