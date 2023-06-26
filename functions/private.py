@@ -9,7 +9,7 @@ from keyboards.start_keyboard import command_pay_keyboard, \
 def send_funds(address, quantity):
     os.system("cd")
     time.sleep(1)
-    cmd = f"/home/ubuntu/./vqr-cli sendtoaddress {address} {quantity}"
+    cmd = f"/home/ubuntu/vqr/./vqr-cli sendtoaddress {address} {quantity}"
     send = os.popen(cmd).read()
     return send
 
@@ -17,7 +17,7 @@ def send_funds(address, quantity):
 def validate_address(address):
     os.system("cd")
     time.sleep(1)
-    cmd = f"/home/ubuntu/./vqr-cli validateaddress {address}"
+    cmd = f"/home/ubuntu/vqr/./vqr-cli validateaddress {address}"
     send = os.popen(cmd).read()
     return send
 

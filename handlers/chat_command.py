@@ -13,8 +13,12 @@ async def command_chat_handler(message: Message, bot: Bot) -> None:
     for chat in chats:
         try:
             data = await bot.get_chat(str(chat))
-            if data.username:
-                await message.answer(f"{data.title}\n@{data.username}")
+            if chat == -1001228658207:
+                text = "Игра с множителями!"
+                await message.answer(f"{data.title}\n@{data.username}\n{text}")
+            else:
+                if data.username:
+                    await message.answer(f"{data.title}\n@{data.username}")
         except exceptions.TelegramBadRequest:
             pass
         except exceptions.TelegramForbiddenError:

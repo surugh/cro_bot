@@ -25,7 +25,7 @@ def address_exists(player_id: int):
                 Player.user_id == player_id
             )
         ).fetchall()
-    return bool(len(result))
+    return result[0]
 
 
 def del_score(player_id: int):
@@ -138,13 +138,13 @@ def get_score(player_id: int) -> int:
     return result
 
 
-def add_score(player_id: int):
+def add_score(player_id: int, multipler=1):
     with Session(cro_db) as session:
         session.execute(
             update(Player).where(
                 Player.user_id == player_id
             ).values(
-                score=Player.score + 1,
+                score=Player.score + multipler,
             )
         )
         session.commit()
