@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher
 
 from handlers import start_command, restart_command, word_handler, \
-    stat_command, help_command, chat_command
+    stat_command, help_command, chat_command, backup_command
 from callbacks import start_callback, restart_callback, word_callback, \
     help_callback
 
@@ -30,6 +30,7 @@ def main() -> None:
     dp.include_router(help_command.router)
     dp.include_router(chat_command.router)
     dp.include_router(start_callback.router)
+    dp.include_router(backup_command.router)
     dp.include_router(restart_callback.router)
     dp.include_router(help_callback.router)
     dp.include_router(word_handler.router)
