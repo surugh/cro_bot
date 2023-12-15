@@ -1,12 +1,14 @@
 import os
 import time
 
+from aiogram.types import CallbackQuery, Message
+
 from databases import crud
 from keyboards.start_keyboard import command_pay_keyboard, \
     command_address_keyboard
 
 
-def send_funds(address, quantity):
+def send_funds(address: str | int, quantity: int | str | float) -> str:
     os.system("cd")
     time.sleep(1)
     cmd = f"/home/ubuntu/vqr/./vqr-cli sendtoaddress {address} {quantity}"
@@ -14,7 +16,7 @@ def send_funds(address, quantity):
     return send
 
 
-def validate_address(address):
+def validate_address(address: str | int) -> str:
     os.system("cd")
     time.sleep(1)
     cmd = f"/home/ubuntu/vqr/./vqr-cli validateaddress {address}"
@@ -22,19 +24,23 @@ def validate_address(address):
     return send
 
 
-async def pay(callback):
+async def pay(callback: CallbackQuery) -> None:
     address = crud.get_address(callback.from_user.id)
     score = round(crud.get_score(callback.from_user.id) * 0.01, 4)
     if score >= 0.01:
         pay_hash = send_funds(address, score)
-        await callback.message.answer(f"Выплата:\n{address}\n{score}\nHASH:")
-        await callback.message.answer(f"{pay_hash}")
+        href = f"https://masternode.vqr.quest/tx.php?hash={pay_hash}"
+        await callback.message.answer(
+            f"Выплата:\n{address}\n<a href={href}>Txid:</a> {score} VQR",
+            disable_web_page_preview=True
+        )
+        # await callback.message.answer()
         crud.del_score(callback.from_user.id)
     else:
         await callback.message.answer("Выплаты доступны от 0,01 VQR")
 
 
-async def propose_pay(message):
+async def propose_pay(message: Message) -> None:
     address = crud.get_address(message.from_user.id)
     score = round(crud.get_score(message.from_user.id) * 0.01, 4)
     await message.answer(
@@ -45,7 +51,7 @@ async def propose_pay(message):
     )
 
 
-async def check_address(message):
+async def check_address(message: Message) -> None:
     address = crud.address_exists(message.from_user.id)
     if not address:
         await message.answer(
@@ -57,7 +63,7 @@ async def check_address(message):
         await propose_pay(message)
 
 
-async def add_user_address(message):
+async def add_user_address(message: Message) -> None:
     if "VQR" in message.text:
         validation = validate_address(message.text)
         if len(validation) == 0:

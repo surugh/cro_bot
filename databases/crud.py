@@ -25,7 +25,7 @@ def address_exists(player_id: int):
                 Player.user_id == player_id
             )
         ).fetchall()
-    return result[0]
+    return result
 
 
 def del_score(player_id: int):

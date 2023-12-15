@@ -1,4 +1,4 @@
-from aiogram import Router, F
+from aiogram import Bot, Router, F
 from aiogram.types import Message
 
 from functions.private import add_user_address
